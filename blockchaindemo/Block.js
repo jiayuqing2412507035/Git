@@ -7,6 +7,10 @@ class Block {
     this.prevHash = prevHash;
   }
 
+  static get genesis() {
+    return this.getGenesis();
+  }
+
   static getGenesis() {
     return new Block(
       0,
