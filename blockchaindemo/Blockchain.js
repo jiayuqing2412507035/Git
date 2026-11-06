@@ -1,11 +1,14 @@
 const Block = require('./Block');
 const crypto = require('crypto');
 
-// 计算区块哈希：基于 index + 前一个哈希 + 时间戳 + 数据
-function computeHash(index, previousHash, timestamp, data) {
+// 挖矿难度：哈希值需要以多少个 0 开头
+const DIFFICULTY = 3;
+
+// 计算区块哈希：基于 index + 前一个哈希 + 时间戳 + 数据 + 随机数 nonce
+function computeHash(index, previousHash, timestamp, data, nonce) {
   return crypto
     .createHash('sha256')
-    .update(`${index}${previousHash}${timestamp}${data}`)
+    .update(`${index}${previousHash}${timestamp}${data}${nonce}`)
     .digest('hex');
 }
 
@@ -31,7 +34,7 @@ class Blockchain {
   isValidNewBlock(newBlock, previousBlock) {
     if (!newBlock || !previousBlock) return false;
     if (newBlock.index !== previousBlock.index + 1) return false;
-    if (newBlock.prevHash !== previousBlock.hash) return false;
+    if (newBlock.previousHash !== previousBlock.hash) return false;
     return true;
   }
 
@@ -44,13 +47,18 @@ class Blockchain {
     }
   }
 
-  // 挖矿：根据传入数据生成并追加一个新区块
+  // 挖矿：不断调整 nonce 计算哈希，直到满足难度要求（工作量证明）
   mine(data) {
     const previousBlock = this.latestBlock;
     const index = previousBlock.index + 1;
     const timestamp = Date.now();
-    const hash = computeHash(index, previousBlock.hash, timestamp, data);
-    const newBlock = new Block(index, timestamp, data, hash, previousBlock.hash);
+    let nonce = 0;
+    let hash = computeHash(index, previousBlock.hash, timestamp, data, nonce);
+    while (!hash.startsWith('0'.repeat(DIFFICULTY))) {
+      nonce += 1;
+      hash = computeHash(index, previousBlock.hash, timestamp, data, nonce);
+    }
+    const newBlock = new Block(index, timestamp, data, hash, previousBlock.hash, nonce);
     this.addBlock(newBlock);
     return newBlock;
   }

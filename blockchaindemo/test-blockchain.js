@@ -4,7 +4,7 @@ try {
   const genesis = Block.getGenesis();
   console.log(genesis);
   console.log("genesis.hash", genesis.hash);
-  console.log("genesis.prevHash", genesis.prevHash);
+  console.log("genesis.previousHash", genesis.previousHash);
 } catch (error) {
   console.log(error);
 }

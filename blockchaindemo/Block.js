@@ -1,10 +1,11 @@
 class Block {
-  constructor(index, timestamp, data, hash, prevHash) {
+  constructor(index, timestamp, data, hash, previousHash, nonce = 0) {
     this.index = index;
     this.timestamp = timestamp;
     this.data = data;
     this.hash = hash;
-    this.prevHash = prevHash;
+    this.previousHash = previousHash;
+    this.nonce = nonce;
   }
 
   static get genesis() {
@@ -17,7 +18,8 @@ class Block {
       1687700000000,
       "first block",
       "00000000000000000005e2d783046270a9f20931097f37f",
-      "0"
+      "0",
+      0
     );
   }
 }
